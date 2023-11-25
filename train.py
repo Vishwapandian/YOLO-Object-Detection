@@ -1,7 +1,3 @@
-"""
-CS/CE/SE 4375 Homework 2 Programming
-Run this script for YOLO training
-"""
 import torch
 import torch.utils.data as data
 import os, math
