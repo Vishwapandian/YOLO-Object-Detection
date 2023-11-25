@@ -1,7 +1,3 @@
-"""
-CS/CE/SE 4375 Homework 2 Programming
-Implement the create_modules() function in this python script
-"""
 import os
 import math
 import torch
@@ -36,8 +32,54 @@ class YOLO(nn.Module):
     def create_modules(self):
         modules = nn.Sequential()
 
-        ### ADD YOUR CODE HERE ###
-        # hint: use the modules.add_module()
+        # Conv1
+        modules.add_module('conv1', nn.Conv2d(3, 16, kernel_size=3, stride=1, padding=1))
+        modules.add_module('relu1', nn.ReLU(inplace=True))
+
+        # MaxPool1
+        modules.add_module('maxpool1', nn.MaxPool2d(kernel_size=2, stride=2))
+
+        # Conv2
+        modules.add_module('conv2', nn.Conv2d(16, 32, kernel_size=3, stride=1, padding=1))
+        modules.add_module('relu2', nn.ReLU(inplace=True))
+
+        # MaxPool2
+        modules.add_module('maxpool2', nn.MaxPool2d(kernel_size=2, stride=2))
+
+        # Conv3
+        modules.add_module('conv3', nn.Conv2d(32, 64, kernel_size=3, stride=1, padding=1))
+        modules.add_module('relu3', nn.ReLU(inplace=True))
+
+        # MaxPool3
+        modules.add_module('maxpool3', nn.MaxPool2d(kernel_size=2, stride=2))
+
+        # Conv4
+        modules.add_module('conv4', nn.Conv2d(64, 128, kernel_size=3, stride=1, padding=1))
+        modules.add_module('relu4', nn.ReLU(inplace=True))
+
+        # MaxPool4
+        modules.add_module('maxpool4', nn.MaxPool2d(kernel_size=2, stride=2))
+
+        # Conv5
+        modules.add_module('conv5', nn.Conv2d(128, 256, kernel_size=3, stride=1, padding=1))
+        modules.add_module('relu5', nn.ReLU(inplace=True))
+
+        # MaxPool5
+        modules.add_module('maxpool5', nn.MaxPool2d(kernel_size=2, stride=2))
+
+        # Flatten
+        modules.add_module('flatten', nn.Flatten())
+
+        # FC1
+        modules.add_module('fc1', nn.Linear(50176, 256))
+        modules.add_module('relu6', nn.ReLU(inplace=True))
+
+        # FC2
+        modules.add_module('fc2', nn.Linear(256, 256))
+        modules.add_module('relu7', nn.ReLU(inplace=True))
+
+        # Output
+        modules.add_module('output', nn.Linear(256, 7 * 7 * (5 * self.num_boxes + self.num_classes)))
 
         return modules
 
