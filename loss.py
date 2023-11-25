@@ -1,7 +1,3 @@
-"""
-CS/CE/SE 4375 Homework 2 Programming
-Implement the compute_loss() function in this python script
-"""
 import os
 import torch
 import torch.nn as nn
