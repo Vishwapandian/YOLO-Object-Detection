@@ -67,19 +67,39 @@ class YOLO(nn.Module):
         # MaxPool5
         modules.add_module('maxpool5', nn.MaxPool2d(kernel_size=2, stride=2))
 
+        # Conv6
+        modules.add_module('conv6', nn.Conv2d(256, 512, kernel_size=3, stride=1, padding=1))
+        modules.add_module('relu6', nn.ReLU(inplace=True))
+
+        # MaxPool6
+        modules.add_module('maxpool6', nn.MaxPool2d(kernel_size=2, stride=2))
+
+        # Conv7
+        modules.add_module('conv7', nn.Conv2d(512, 1024, kernel_size=3, stride=1, padding=1))
+        modules.add_module('relu7', nn.ReLU(inplace=True))
+
+        # Conv8
+        modules.add_module('conv8', nn.Conv2d(512, 1024, kernel_size=3, stride=1, padding=1))
+        modules.add_module('relu8', nn.ReLU(inplace=True))
+
+        # Conv9
+        modules.add_module('conv9', nn.Conv2d(512, 1024, kernel_size=3, stride=1, padding=1))
+        modules.add_module('relu9', nn.ReLU(inplace=True))
+
         # Flatten
         modules.add_module('flatten', nn.Flatten())
 
         # FC1
         modules.add_module('fc1', nn.Linear(50176, 256))
-        modules.add_module('relu6', nn.ReLU(inplace=True))
 
         # FC2
         modules.add_module('fc2', nn.Linear(256, 256))
-        modules.add_module('relu7', nn.ReLU(inplace=True))
 
         # Output
         modules.add_module('output', nn.Linear(256, 7 * 7 * (5 * self.num_boxes + self.num_classes)))
+
+        # Sigmoid activation
+        modules.add_module('sigmoid', nn.Sigmoid())
 
         return modules
 
