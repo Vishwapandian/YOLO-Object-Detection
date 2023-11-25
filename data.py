@@ -1,7 +1,3 @@
-"""
-CS/CE/SE 4375 Homework 2 Programming
-Implement the __getitem__() function in this python script
-"""
 import torch
 import torch.utils.data as data
 import csv
@@ -14,7 +10,7 @@ import cv2
 import glob
 import matplotlib
 import matplotlib.pyplot as plt
-import matplotlib.patches 
+import matplotlib.patches as patches
 
 
 # The dataset class
@@ -64,16 +60,63 @@ class CrackerBox(data.Dataset):
 
     # TODO: implement this function
     def __getitem__(self, idx):
-    
         # gt file
         filename_gt = self.gt_paths[idx]
-        
-        ### ADD YOUR CODE HERE ###
 
-        # this is the sample dictionary to be returned from this function
-        sample = {'image': image_blob,
-                  'gt_box': gt_box_blob,
-                  'gt_mask': gt_mask_blob}
+        # Load image
+        image_path = filename_gt.replace("-box.txt", ".jpg")
+        image = cv2.imread(image_path)
+        image = cv2.resize(image, (self.yolo_image_size, self.yolo_image_size))
+        image = image.astype(np.float32)
+        image -= self.pixel_mean
+        image /= 255.0
+        image = image.transpose((2, 0, 1))  # Change the dimension to (channel, height, width)
+
+        # Load ground truth bounding box
+        with open(filename_gt, 'r') as f:
+            gt_box_data = [float(x) for x in f.readline().split()]
+
+        gt_box = np.zeros((5, self.yolo_grid_num, self.yolo_grid_num))
+        if gt_box_data:  # Check if ground truth bounding box exists
+            x1, y1, x2, y2 = gt_box_data
+            cx = (x1 + x2) / 2.0
+            cy = (y1 + y2) / 2.0
+            w = x2 - x1
+            h = y2 - y1
+
+            # Normalize the bounding box coordinates and dimensions
+            cx /= self.width
+            cy /= self.height
+            w /= self.width
+            h /= self.height
+
+            # Find the grid cell responsible for the bounding box
+            grid_x = int(cx * self.yolo_grid_num)
+            grid_y = int(cy * self.yolo_grid_num)
+
+            # Calculate offsets
+            offset_x = (cx * self.yolo_grid_num) - grid_x
+            offset_y = (cy * self.yolo_grid_num) - grid_y
+
+            # Set the values in gt_box
+            gt_box[0, grid_y, grid_x] = offset_x
+            gt_box[1, grid_y, grid_x] = offset_y
+            gt_box[2, grid_y, grid_x] = w
+            gt_box[3, grid_y, grid_x] = h
+            gt_box[4, grid_y, grid_x] = 1  # Confidence
+
+        # Create ground truth mask
+        gt_mask = np.zeros((self.yolo_grid_num, self.yolo_grid_num))
+        if gt_box_data:
+            gt_mask[grid_y, grid_x] = 1
+
+        # Convert everything to PyTorch tensors
+        image_blob = torch.from_numpy(image)
+        gt_box_blob = torch.from_numpy(gt_box)
+        gt_mask_blob = torch.from_numpy(gt_mask)
+
+        # Construct the sample dictionary
+        sample = {'image': image_blob, 'gt_box': gt_box_blob, 'gt_mask': gt_mask_blob}
 
         return sample
 
